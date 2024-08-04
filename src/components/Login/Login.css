@@ -1,0 +1,68 @@
+.gradient-custom-2 {
+    background: #fccb90;
+    background: -webkit-linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593);
+    background: linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593);
+}
+
+@media (min-width: 768px) {
+    .gradient-form {
+        height: 100vh !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .gradient-custom-2 {
+        border-top-right-radius: .3rem;
+        border-bottom-right-radius: .3rem;
+    }
+}
+
+.local {
+    color: #ffffff;
+    background-color: #f25c04 ;
+}
+
+.fas {
+    color: #f25c04;
+    font-size: 20px;
+}
+
+
+.background {
+    background-color: #e69a3e
+}
+
+.background-login {
+    background-color: #eee;
+    height: 100vh !important;
+}
+
+/* .background-img {
+    background-image: url(../../../assets/images/cadastro-img.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 80vh;
+} */
+
+.img-size {
+    background-image: url(../../assets/image-login.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 80%;
+}
+
+.img-md {
+    background-image: url(../../assets/image-login.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 80%;
+}
+
+.img-sm {
+    
+}
+
+.img-xs {
+    
+}
