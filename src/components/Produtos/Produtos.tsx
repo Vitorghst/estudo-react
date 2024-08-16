@@ -57,6 +57,7 @@ const Produtos = () => {
 
   const location = useLocation();
   const { permission } = location.state || {};
+  const { userId } = location.state || {};
 
   moment.locale('pt-br');
 
@@ -233,7 +234,7 @@ const Produtos = () => {
           </div>
         </div>
       </div>
-      <Menu permUser={permission} />
+      <Menu permUser={permission} idUser={userId}/>
     </div>
   );
 }

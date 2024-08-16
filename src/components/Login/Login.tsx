@@ -1,24 +1,27 @@
-import './Login.css'
-import logo1 from '../../assets/logo1.png'
-import { Container, Grid, Card, CardContent, Button, Typography, TextField, useMediaQuery } from '@mui/material';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { Navigate } from 'react-router-dom';
+import {
+  Container, Grid, Card, CardContent, Button, Typography, TextField, useMediaQuery, Modal, Box } from '@mui/material';
+import logo1 from '../../assets/logo1.png';
+import { useSnackbar } from 'notistack';
+import './Login.css'
 
 
 function LoginForm({ onLogin }: any) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [permission, setPermission] = useState('');
+  const [userId, setUserId] = useState('');
   const [error, setError] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const isMd = useMediaQuery('(min-width:600px)');
-  
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError('');
-
 
     try {
       const response = await axios.post('http://localhost:5110/api/Auth/validate', {
@@ -26,19 +29,23 @@ function LoginForm({ onLogin }: any) {
         password: password
       });
 
-
       if (response.status === 200) {
-        alert(`Bem-vindo, ${username}!`);
+        enqueueSnackbar(`Bem-vindo, ${username}!`, { variant: 'success' }); // Adicione esta linha
         const user = await axios.get('http://localhost:5110/api/Auth/getUser', {
           params: {
             username: username
           }
         });
-        sessionStorage.setItem('token', username)
-        setIsLoggedIn(true);
-        onLogin(username);
-        const permUser = user.data.permission
-        setPermission(permUser)
+        const timer = setTimeout(() => {
+          sessionStorage.setItem('token', username);
+          setIsLoggedIn(true);
+          onLogin(username);
+          const idUser = user.data.id;
+          setUserId(idUser);
+          const permUser = user.data.permission;
+          setPermission(permUser);
+        }, 3000);
+        return () => clearTimeout(timer);
       } else {
         sessionStorage.removeItem('token');
         alert(response.data);
@@ -46,21 +53,20 @@ function LoginForm({ onLogin }: any) {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
-        console.log(axiosError.response?.data)
+        console.log(axiosError.response?.data);
         if (axiosError.response?.status === 401) {
           alert(axiosError.response?.data);
         } else {
         }
       }
     }
-
-
   };
 
+
   if (isLoggedIn) {
-    return <Navigate to="/Produtos" state={{ permission }} replace />;
+    return <Navigate to="/Produtos" state={{ permission, userId }} replace />;
   }
-  
+
 
   return (
     <section className="h-100 gradient-form background-login">

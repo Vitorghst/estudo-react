@@ -8,7 +8,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 const NavBar = ({ onToken }: any) => {
   const navigate = useNavigate();
   
-  function exit() {
+  const exit = () => {
     sessionStorage.removeItem('token');
     onToken(false)
     navigate('/')

@@ -6,14 +6,31 @@ import { faCartShopping, faMagnifyingGlass, faMinus, faPenToSquare, faPlus, faTr
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import logo from '../../assets/pedidos.png';
 import car from '../../assets/cartcarrinho.png'
+import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Grid';
+import info from '../../assets/cnpj.png'
+import Button from '@mui/material/Button';
+import { Box, FormControl, InputLabel, MenuItem, Modal, Select, SelectChangeEvent, styled, Typography } from '@mui/material';
+import Input from '@mui/joy/Input';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
 
 
 interface MenuProps {
   permUser: string;
+  idUser: number;
 }
 
 interface MenuItem {
   id: number;
+  name: string;
+  description: string;
+  category: string;
+  price: any;
+  imagePath: string;
+}
+
+interface addMenuItem {
   name: string;
   description: string;
   category: string;
@@ -54,31 +71,56 @@ interface FormData {
   orderItems: OrderItemWithoutId[];
 }
 
-const Menu: React.FC<MenuProps> = ({ permUser }) => {
+const Menu: React.FC<MenuProps> = ({ permUser, idUser }) => {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<string>('');
   const [searchText, setSearchText] = useState('');
   const [status, setStatus] = useState('Aberto');
   const [items, setItems] = useState<any[]>([]);
   const [quantity, setQuantity] = useState(0);
+  const [open, setOpen] = React.useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [editForm, setEditForm] = useState({ name: '', description: '', price: '', category: '', imagePath: '' });
+
+
+  const style = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 700,
+    bgcolor: '#fff',
+    border: '#fff',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: '20px'
+  };
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   useEffect(() => {
     const listMenu = async () => {
       try {
         const response = await axios.get('http://localhost:5110/Menu');
         setMenu(response.data);
+
       } catch (error) {
         console.error('Erro ao buscar restaurantes!', error);
       }
     };
     listMenu();
-  }, []);
+  }, [menu]);
 
   const handleSearchChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setSearchText(event.target.value);
   };
 
+  const handleFileChange = (event: any) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+    console.log(file);
+  };
 
   const filtrarCategoria = (categoria: string) => {
     setCategoriaSelecionada(categoria);
@@ -134,11 +176,33 @@ const Menu: React.FC<MenuProps> = ({ permUser }) => {
     optionalAddress: '',
     status: '',
     total: '',
-    pagamentoEntrega: '',
+    pagamentoEntrega: 'Dinheiro',
     pagamentoAplicativo: '',
-    usuario: 0,
+    usuario: idUser,
     orderItems: [] as OrderItemWithoutId[]
   });
+
+  const initialFormData: addMenuItem = {
+    name: '',
+    imagePath: '',
+    description: '',
+    price: '',
+    category: ''
+  };
+
+  const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+  });
+
+  const [formDataAdd, setFormDataAdd] = useState<addMenuItem>(initialFormData);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -148,6 +212,22 @@ const Menu: React.FC<MenuProps> = ({ permUser }) => {
     }));
   };
 
+  const handleInputChangeAddItem = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormDataAdd((prevData) => ({
+      ...prevData,
+      [name]: value
+
+    }));
+  };
+
+  const handleInputChangeAdd = (event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<string>) => {
+    const { name, value } = event.target;
+    setFormDataAdd({
+      ...formDataAdd,
+      [name]: value,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -160,12 +240,25 @@ const Menu: React.FC<MenuProps> = ({ permUser }) => {
     }
   };
 
+  const handleAdditem = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      console.log(formDataAdd)
+      const response = await axios.post('http://localhost:5110/Menu/AddItem', formDataAdd);
+      setOpen(false);
+      setFormDataAdd(initialFormData);
+      console.log('Order created:', response.data);
+    } catch (error) {
+      console.error('There was an error creating the order:', error);
+    }
+  };
+
   const emitAddEvent = (menuItem: any) => {
     setItems(prevItems => {
       const itemIndex = prevItems.findIndex(item => item.name === menuItem.name);
       if (itemIndex !== -1) {
         // Item já existe, incrementa a quantidade
-        const newItems = prevItems.map((item, index) => 
+        const newItems = prevItems.map((item, index) =>
           index === itemIndex ? { ...item, quantity: item.quantity + 1 } : item
         );
         updateFormDataOrderItems(newItems);
@@ -179,7 +272,7 @@ const Menu: React.FC<MenuProps> = ({ permUser }) => {
       }
     });
   };
-  
+
   const updateFormDataOrderItems = (items: any[]) => {
     const orderItems: OrderItemWithoutId[] = items.map(item => ({
       quantity: item.quantity,
@@ -196,7 +289,6 @@ const Menu: React.FC<MenuProps> = ({ permUser }) => {
     console.log(formData)
   };
   
-
   return (
     <div className='container'>
       <div className='row'>
@@ -207,7 +299,7 @@ const Menu: React.FC<MenuProps> = ({ permUser }) => {
             </div>
             <div className="col-sm-4 col-md-6 col-lg-4 p-3">
               {permUser === 'A' && (
-                <button type="button"
+                <button type="button" onClick={handleOpen}
                   className="btn btn-success ms-4 float-right shadow btn-sm space text-decoration-none"
                   data-bs-toggle="modal" data-bs-target="#adicionarItem">
                   <FontAwesomeIcon icon={faPlus} /> Adicionar items
@@ -339,101 +431,289 @@ const Menu: React.FC<MenuProps> = ({ permUser }) => {
             </div>
           </div>
         </div>
-        <div className="col-md-4 border-top mt-3 content-body bg-white">
+        <div className="col-sm-12 col-md-4 col-lg-4">
 
           <div className="row mt-3">
-            <div className="col-md-12">
 
-            <div className="list-group">
-                {items.map((item, index) => (
-                  <div className="list-group-item d-flex justify-content-between align-items-center" key={index}>
-                    <div className='col-sm-10 col-md-9 width-col col-lg-9'>
-                      <h6>{item.name}</h6>
-                      <p className="mb-0">{item.description}</p>
-                      <span className="badge bg-primary rounded-pill">R$ {item.price.toFixed(2)}</span>
+            {items.length > 0 && (
+              <div className="list-group col-sm-12 col-md-12 col-lg-12 border-top content-order bg-white">
+                <h5 className="tipografia padding-car"><img src={car} alt="" width="30" /> Carrinho</h5>
+                <div className='content-body'>
+                  {items.map((item, index) => (
+
+                    <div className="d-flex justify-content-between align-items-center" key={index}>
+                      <div className="container">
+                        <div className="row mt-3">
+                          <div className="col">
+                            <img width="100%" className='margin-food' src={item.imagePath} alt={item.name} />
+                          </div>
+                          <div className="col">
+                            {item.name}
+                            <br></br>
+                            <span className="badge bg-primary rounded-pill">R$ {item.price.toFixed(2)}</span>
+                          </div>
+                          <div className="col mb-3">
+                            <button className="btn btn-outline-danger btn-sm" onClick={() => removeQuantity(item.id)} disabled={item.quantity === 1}>
+                              <FontAwesomeIcon icon={faMinus} />
+                            </button>
+                            <span className="mx-2">{item.quantity}</span>
+                            <button className="btn btn-outline-success btn-sm" onClick={() => addQuantity(item.id)}>
+                              <FontAwesomeIcon icon={faPlus} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className='col-sm-4 col-lg-4 width-col'>
-                      <button className="btn btn-outline-danger btn-sm" onClick={() => removeQuantity(item.id)} disabled={item.quantity === 1}>
-                        <FontAwesomeIcon icon={faMinus} />
+                  ))}
+                </div>
+              </div>
+            )}
 
-                      </button>
 
-                      <span className="mx-2">{item.quantity}</span>
-                      <button className="btn btn-outline-success btn-sm" onClick={() => addQuantity(item.id)}>
-                        <FontAwesomeIcon icon={faPlus} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+
+            <div className={items.length > 0 ? 'list-group border-top max-height-order mt-3 content-body bg-white' : 'list-group border-top max-height-order content-body bg-white'}>
+              <h5 className="tipografia mb-4"><img src={info} className="mb-1" alt="" width="30" /> Informações para entrega</h5>
+              <div className='content-body'>
+                <form onSubmit={handleSubmit}>
+                  <Grid container spacing={4}>
+                    <Grid item xs={8} md={12} lg={12}>
+                      <TextField
+                        id="name12"
+                        name="name12"
+                        label="Name"
+                        variant="outlined"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="email"
+                        name="email"
+                        label="Email"
+                        variant="outlined"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="emailConfirmation"
+                        name="emailConfirmation"
+                        label="Email Confirmation"
+                        variant="outlined"
+                        type="email"
+                        value={formData.emailConfirmation}
+                        onChange={handleInputChange}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="telefone"
+                        name="telefone"
+                        label="Telefone"
+                        variant="outlined"
+                        value={formData.telefone}
+                        onChange={handleInputChange}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="cep"
+                        name="cep"
+                        label="CEP"
+                        variant="outlined"
+                        value={formData.cep}
+                        onChange={handleInputChange}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="logradouro"
+                        name="logradouro"
+                        label="Logradouro"
+                        variant="outlined"
+                        value={formData.logradouro}
+                        onChange={handleInputChange}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="bairro"
+                        name="bairro"
+                        label="Bairro"
+                        variant="outlined"
+                        value={formData.bairro}
+                        onChange={handleInputChange}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="localidade"
+                        name="localidade"
+                        label="Localidade"
+                        variant="outlined"
+                        value={formData.localidade}
+                        onChange={handleInputChange}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="number"
+                        name="number"
+                        label="Number"
+                        variant="outlined"
+                        value={formData.number}
+                        onChange={handleInputChange}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="optionalAddress"
+                        name="optionalAddress"
+                        label="Optional Address"
+                        variant="outlined"
+                        value={formData.optionalAddress}
+                        onChange={handleInputChange}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        id="status"
+                        name="status"
+                        label="Status"
+                        variant="outlined"
+                        value={formData.status}
+                        onChange={handleInputChange}
+                        required
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        id="pagamentoEntrega"
+                        name="pagamentoEntrega"
+                        label="Pagamento"
+                        variant="outlined"
+                        value={formData.pagamentoEntrega}
+                        onChange={handleInputChange}
+                        fullWidth
+                      />
+                    </Grid>
+                  </Grid>
+                  <Button className='botao-finalizar' variant="contained" type='submit' color="success">
+                    Finalizar
+                  </Button>
+                </form>
               </div>
             </div>
           </div>
-          <div className='mt-2'>
-            <form onSubmit={handleSubmit}>
-              <div>
-                <label>Name:</label>
-                <input type="text" name="name" value={formData.name} onChange={handleInputChange} required />
-              </div>
-              <div>
-                <label>Email:</label>
-                <input type="email" name="email" value={formData.email} onChange={handleInputChange} required />
-              </div>
-              <div>
-                <label>Email Confirmation:</label>
-                <input type="email" name="emailConfirmation" value={formData.emailConfirmation} onChange={handleInputChange} required />
-              </div>
-              <div>
-                <label>Telefone:</label>
-                <input type="text" name="telefone" value={formData.telefone} onChange={handleInputChange} required />
-              </div>
-              <div>
-                <label>CEP:</label>
-                <input type="text" name="cep" value={formData.cep} onChange={handleInputChange} required />
-              </div>
-              <div>
-                <label>Logradouro:</label>
-                <input type="text" name="logradouro" value={formData.logradouro} onChange={handleInputChange} required />
-              </div>
-              <div>
-                <label>Bairro:</label>
-                <input type="text" name="bairro" value={formData.bairro} onChange={handleInputChange} required />
-              </div>
-              <div>
-                <label>Localidade:</label>
-                <input type="text" name="localidade" value={formData.localidade} onChange={handleInputChange} required />
-              </div>
-              <div>
-                <label>Number:</label>
-                <input type="text" name="number" value={formData.number} onChange={handleInputChange} required />
-              </div>
-              <div>
-                <label>Optional Address:</label>
-                <input type="text" name="optionalAddress" value={formData.optionalAddress} onChange={handleInputChange} />
-              </div>
-              <div>
-                <label>Status:</label>
-                <input type="text" name="status" value={formData.status} onChange={handleInputChange} required />
-              </div>
-              <div>
-                <label>Total:</label>
-                <input type="text" name="total" value={formData.total} onChange={handleInputChange} required />
-              </div>
-              <div>
-                <label>Pagamento Entrega:</label>
-                <input type="text" name="pagamentoEntrega" value={formData.pagamentoEntrega} onChange={handleInputChange} />
-              </div>
-              <div>
-                <label>Pagamento Aplicativo:</label>
-                <input type="text" name="pagamentoAplicativo" value={formData.pagamentoAplicativo} onChange={handleInputChange} />
-              </div>
-              <div>
-                <label>Usuario:</label>
-                <input type="number" name="usuario" value={formData.usuario} onChange={handleInputChange} required />
-              </div>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <h5 className="tipografia mb-4"><img src={info} className="mb-1" alt="" width="30" /> Informações para entrega</h5>
+              <form onSubmit={handleAdditem}>
+                <Grid container spacing={4} >
+                  <Grid item xs={8} md={12} lg={12}>
+                    <TextField
+                      id="name"
+                      name="name"
+                      label="Name"
+                      variant="outlined"
+                      value={formDataAdd.name}
+                      onChange={handleInputChangeAddItem}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      id="description"
+                      name="description"
+                      label="Descrição"
+                      variant="outlined"
+                      type="description"
+                      value={formDataAdd.description}
+                      onChange={handleInputChangeAddItem}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      id="price"
+                      name="price"
+                      label="Preço"
+                      variant="outlined"
+                      type="number"
+                      value={formDataAdd.price}
+                      onChange={handleInputChangeAddItem}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormControl variant="outlined" fullWidth required>
+                      <InputLabel id="category-label">Categoria</InputLabel>
+                      <Select
+                        labelId="category-label"
+                        id="category"
+                        name="category"
+                        value={formDataAdd.category}
+                        onChange={handleInputChangeAdd}
+                        label="Categoria"
+                      >
+                        <MenuItem value="">
+                          <em>Nenhuma</em>
+                        </MenuItem>
+                        <MenuItem value="Cachorro Quente">Cachorro Quente</MenuItem>
+                        <MenuItem value="Lanches">Lanches</MenuItem>
+                        {/* Adicione mais opções conforme necessário */}
+                      </Select>
+                    </FormControl>
+                  </Grid>
 
-              <button type="submit">Create Order</button>
-            </form>
-          </div>
+                  <Grid item xs={6}>
+                    <Button
+                      component="label"
+                      variant="contained"
+                      startIcon={<CloudUploadIcon />}
+                    >
+                      Imagem do Item
+                      <VisuallyHiddenInput type="file" onChange={handleFileChange} />
+                    </Button>
+                  </Grid>
+                </Grid>
+                <Button className='botao-finalizar' variant="contained" type='submit' color="success">
+                  Finalizar
+                </Button>
+              </form>
+            </Box>
+          </Modal>
         </div>
       </div>
     </div>

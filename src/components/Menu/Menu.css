@@ -11,6 +11,23 @@
     width: 100%;
 }
 
+.content-order {
+    max-height: 375px;
+}
+
+.padding-car {
+    padding: 14px 7px 1px 15px;
+}
+
+.botao-finalizar {
+    float: right;
+    top: 15px;
+}
+
+.max-height-order {
+    max-height: 596px;
+}
+
 .container {
     max-width: 95%;
 }

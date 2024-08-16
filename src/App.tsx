@@ -7,6 +7,7 @@ import Login from './components/Login/Login';
 import store from '../src/components/Store/Store';
 import { Provider } from 'react-redux';
 import Navbar from './components/NavBar/Navbar';
+import { SnackbarProvider } from 'notistack';
 
 interface AuthCheckerProps {
   children: ReactNode;
@@ -53,6 +54,7 @@ function App() {
   }
 
   return (
+    <SnackbarProvider maxSnack={3}>
     <Router>
       <div className="App">
         {(isLoggedIn && sessionStorage.getItem('token')) && <Navbar onToken={handleRemove} />}
@@ -69,6 +71,7 @@ function App() {
         </Provider>
       </div>
     </Router>
+    </SnackbarProvider>
   );
 }
 
