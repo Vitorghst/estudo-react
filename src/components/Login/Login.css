@@ -33,9 +33,11 @@
 }
 
 .background-login {
-    background-color: #eee;
-    height: 100vh !important;
+    min-height: 100vh; /* Garante que ocupe 100% da altura da tela */
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0); /* Fundo com gradiente */
+    overflow: auto; /* Remove qualquer overflow */
 }
+  
 
 /* .background-img {
     background-image: url(../../../assets/images/cadastro-img.png);
@@ -59,10 +61,7 @@
     background-position: 80%;
 }
 
-.img-sm {
-    
-}
+/* .overflow-login {
+    overflow: hidden;
+} */
 
-.img-xs {
-    
-}

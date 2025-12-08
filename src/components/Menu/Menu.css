@@ -2,6 +2,10 @@
     border-radius: 5px 5px 5px;
 }
 
+.background-list {
+    background-color: "#006491";
+}
+
 .border-radius-menu {
     border-radius: 15px;
 }
@@ -9,6 +13,10 @@
 .full-size {
     height: 100%;
     width: 100%;
+}
+
+.bg-blue {
+    background-color: #006491;
 }
 
 .content-order {
@@ -73,4 +81,8 @@
     .width-col {
         width: 80%;
     }
+}
+
+.p-3 {
+    padding: 1rem 0rem 0rem 1rem !important;
 }

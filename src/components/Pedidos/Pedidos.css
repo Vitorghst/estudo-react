@@ -1,0 +1,30 @@
+.container-pedidos {
+    background-color: #006491;
+    padding: 17px 27px 15px 23px;
+    border-radius: 15px;
+}
+
+.div-interna {
+    overflow: auto;
+    max-height: 400px;
+    padding-right: 10px;
+    padding-left: 5px;
+}
+
+.div-interna::-webkit-scrollbar {
+    width: 6px;      /* super fino */
+    height: 6px;
+}
+
+.div-interna::-webkit-scrollbar-track {
+    background: transparent; 
+}
+
+.div-interna::-webkit-scrollbar-thumb {
+    background-color: rgb(255, 255, 255);
+    border-radius: 50px;
+}
+
+.div-interna::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(255, 255, 255);
+}

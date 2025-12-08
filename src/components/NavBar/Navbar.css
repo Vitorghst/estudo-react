@@ -19,20 +19,25 @@
 
 
 .tipografia {
-    font-family: Arial, Helvetica, sans-serif !important;
+    font-family: One Dot Condensed Bold, Arial Narrow, Arial, Helvetica, sans-serif;
     font-size: 15px !important;
 }
 
 .contact {
     font-size: 18px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: One Dot Condensed Bold, Arial Narrow, Arial, Helvetica, sans-serif;
 }
 
 .main {
     display: flex;
     flex-direction: column;
-    background-color: whitesmoke;
+    background-color: rgb(255, 255, 255);
     overflow-x: hidden;
+}
+
+.avatar-nav {
+    position: fixed;
+    right: 18px;
 }
 
 .margin {
@@ -75,14 +80,18 @@
     margin-left: 50%;
 }
 
+.typo {
+    font-family: One Dot Condensed Bold, Arial Narrow, Arial, Helvetica, sans-serif !important; 
+} 
+
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: One Dot Condensed Bold, Arial Narrow, Arial, Helvetica, sans-serif;
     background: #fafafa;
 }
 
 p {
-    font-family: 'Poppins', sans-serif;
+    font-family: One Dot Condensed Bold, Arial Narrow, Arial, Helvetica, sans-serif;
     font-size: 1.1em;
     font-weight: 300;
     line-height: 1.7em;
@@ -115,14 +124,36 @@ a:focus {
 .line {
     width: 100%;
     height: 1px;
-    border-bottom: 1px dashed #ddd;
+    border-bottom: 1px dashed #ffffff;
     margin: 40px 0;
 }
 
 
+.background-colora-white {
+    background-color: white;
+}
+
+.door-exit {
+    top: 9px;
+    position: fixed;
+    right: 72px
+}
+
+.nav-exit {
+    /* display: block; */
+    /* padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x); */
+    /* font-size: var(--bs-nav-link-font-size); */
+    font-weight: var(--bs-nav-link-font-weight);
+    color: var(--bs-nav-link-color);
+    text-decoration: none;
+    background: 0 0;
+    border: 0;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+}
+
 .text-hover {
     box-shadow: inset 0 0 0 0 #ffffff !important;
-    color: #c08b18 !important;
+    color: rgb(62 206 206) !important;
     padding: 0 .64rem !important;
     margin: 0 -.50rem !important;
     transition: color .3s ease-in-out, box-shadow .3s ease-in-out !important; 
@@ -135,7 +166,6 @@ a:focus {
 
 .icon-user {
     margin-left: 60%;
-
 }
 
 .dropdown-menu[data-bs-popper] {
@@ -146,7 +176,7 @@ a:focus {
 
 .fa-door-open:before {
     content: "\f52b";
-    color: #d67032;
+    color:rgb(15, 125, 210);
     font-size: 20px;
 }
 
@@ -166,11 +196,11 @@ a:focus {
 
 
 .border-top {
-    border-top: 4px solid #d67032 !important;
+    border-color: rgb(143 101 31) !important;
 }
 
 .text-hover:hover {
-    color: #d67032 !important;
+    color: rgb(62 206 206) !important;
 }
 
 .margin-top {
@@ -178,7 +208,7 @@ a:focus {
 }
 text-hover
 .local {
-    color: #d67032;
+    color: rgb(62 206 206);
 }
 
 .fa-store-alt:before {
@@ -188,7 +218,7 @@ text-hover
 
 .fa-address-book:before {
     content: "\f2b9";
-    color: #d67032;
+    color: rgba(228, 151, 9, 0.529);
     font-size: 35px;
 }
 
